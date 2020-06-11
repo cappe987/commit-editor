@@ -1,13 +1,23 @@
 module Lib
-    ( someFunc
+    ( startWindow
     ) where
 
 
 import Graphics.UI.Gtk 
+import System.IO
 
-someFunc :: IO ()
--- someFunc = putStrLn "someFunc"
-someFunc = do
+
+
+parseCommitFile filepath = do 
+  content <- readFile filepath
+  let linesOfFile = lines content
+
+  print ""
+
+
+
+startWindow :: String -> IO ()
+startWindow filepath = do
   initGUI
   window <- windowNew
   on window objectDestroy mainQuit
