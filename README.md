@@ -4,4 +4,5 @@ A simple editor to write commits in
 
 
 # To-do
-- [ ] Option to abort commit
+- [X] Option to abort commit
+- [ ] Show which files are being modified
