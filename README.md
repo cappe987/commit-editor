@@ -3,6 +3,7 @@ A simple editor to write commits in.
 
 # Dependencies
 - gtk3
+- gtk2hs-buildtools
 
 # Install
 ```
