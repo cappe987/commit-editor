@@ -9,5 +9,8 @@ main = do
   if null args then
     print "No input file"
   else 
+    -- do 
+    --   putStrLn ""
     -- someFunc 
     startWindow $ head args
+      -- parseCommitFile $ head args

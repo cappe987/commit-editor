@@ -35,9 +35,10 @@ library
   build-depends:
       base >=4.7 && <5
     , gtk
+    , text
   default-language: Haskell2010
 
-executable project-exe
+executable hscommit
   main-is: Main.hs
   other-modules:
       Paths_project
@@ -48,9 +49,10 @@ executable project-exe
       base >=4.7 && <5
     , project
     , gtk
+    , text
   default-language: Haskell2010
 
-test-suite project-test
+test-suite hscommit-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
