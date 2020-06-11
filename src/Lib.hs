@@ -28,8 +28,6 @@ parseCommitFile filepath = do
   let originBranch = List.takeWhile (/= '.') $ List.drop 34 $ List.head $ List.tail branchLine 
   let originFormatted = List.init $ List.map (\c -> if c == '\'' then '/' else c) originBranch
 
-  -- print branch
-  -- print originFormatted
   return $ CommitInfo {branch = branch, origin = originFormatted}
 
 
@@ -42,7 +40,6 @@ sendCommit path msg comments = do
   startIter <- textBufferGetStartIter commentText
   endIter   <- textBufferGetEndIter commentText
   commentString <- textBufferGetText commentText startIter endIter False :: IO String
-  -- let commentLines = List.lines commentString
 
   let fullCommit = "\n" ++ text ++ "\n" ++ commentString
 
@@ -50,11 +47,11 @@ sendCommit path msg comments = do
   let t = Text.strip $ Text.pack text
   if unpack t == "" then 
     do 
-      putStrLn "No commit message"
+      putStrLn "No commit message..."
       return False
   else
     do
-      putStrLn "Committing"
+      putStrLn "Committing..."
       appendFile path fullCommit
       return True
 
@@ -65,9 +62,9 @@ startWindow filepath = do
 
   commitInfo <- parseCommitFile filepath 
 
-
-
   initGUI
+
+  -- Window
   window <- windowNew
   on window objectDestroy mainQuit
   set window [ 
@@ -75,38 +72,27 @@ startWindow filepath = do
     , windowTitle := "Hello World"
     , windowResizable := False]
 
-  button <- buttonNew
-  set button [ buttonLabel := "Commit"]
-  -- on button buttonActivated $ do
-  --   putStrLn "A \"clicked\"-handler to say \"destroy\""
-  --   widgetDestroy window
 
 
+  -- Branch information
   branchLabel <- 
     labelNew (Just $ "Branch: " ++ branch commitInfo ++ "\nRemote: " ++ origin commitInfo)
   miscSetAlignment branchLabel 0 0.5
 
   text <- labelNew (Just "Title")
-  -- set text [frameLabelXAlign := 0]
   miscSetAlignment text 0 0.5
 
 
+  -- Title of commit
   commitMsg <- entryNew
   -- For some reason entryWidthChars adds 8 chars.
   set commitMsg [
       entryWidthChars := 64
     , entryMaxLength := 72
-    -- , entrySelectionBound := readAttr 1
-    -- , entryActivate := Signal (True, commitMsg, (\s -> s))
     ]
-  -- commitMsg `on` entryActivate $ set commitMsg [entryText := "This should trigger commit"]
-
-  -- commitMsg `on` entryInsertAtCursor $ putStrLn
-  -- commitMsg `on` entryBackspace  $ print "HI"
-  -- commitMsg `on` entryCopyClipboard $ print "HI"
-  -- commitMsg `on` entryPreeditChanged  $ (\s -> putStrLn $ "Hello " ++ s) 
 
 
+  -- Comment field
   textfield <- textViewNew 
   set textfield [
       textViewWrapMode    := WrapWord 
@@ -119,19 +105,18 @@ startWindow filepath = do
   textViewSetBorderWindowSize textfield TextWindowTop    10
   textViewSetBorderWindowSize textfield TextWindowBottom 10
 
-  -- texttable <- textTagTableNew
-  -- textTagTableAdd self tag
-  textbuffer <- textBufferNew Nothing
-  iter <- textBufferGetStartIter textbuffer
-  -- textBufferInsert textbuffer iter "\n"
-  -- textBufferInsert textbuffer iter "\n"
-  -- textBufferInsert textbuffer iter "\n"
-  textViewBackwardDisplayLineStart textfield iter
-  -- iter <- textBufferGetStartIter textbuffer
 
-  textViewSetBuffer textfield textbuffer  
 
-  
+  -- Commit button
+  button <- buttonNew
+  set button [ buttonLabel := "Commit"]
+  -- Trigger sending the commit
+  on button buttonActivated $ do 
+    res <- sendCommit filepath commitMsg textfield 
+    Control.Monad.when res $ widgetDestroy window
+
+
+  -- Vertical box holding all the widgets
   box <- vBoxNew False 10
   containerAdd box branchLabel
   containerAdd box text
@@ -140,13 +125,8 @@ startWindow filepath = do
   containerAdd box button
 
   set window [ containerChild := box ]
-  -- set window [ containerChild := text ]
 
-  -- Trigger sending the commit
-  on button buttonActivated $ do 
-    res <- sendCommit filepath commitMsg textfield 
-    Control.Monad.when res $ widgetDestroy window
-    
+  
 
   widgetShowAll window
   mainGUI -- main loop
