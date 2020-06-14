@@ -26,7 +26,8 @@ parseCommitFile filepath = do
 
   --35 is where remote name starts
   let originBranch = List.takeWhile (/= '.') $ List.drop 34 $ List.head $ List.tail branchLine 
-  let originFormatted = List.init $ List.map (\c -> if c == '\'' then '/' else c) originBranch
+  let originMapped = List.map (\c -> if c == '\'' then '/' else c) originBranch
+  let originFormatted = if List.null originMapped then "" else List.init originMapped
 
   return $ CommitInfo {branch = branch, origin = originFormatted}
 
